@@ -68,11 +68,6 @@
     return self;
 }
 
-- (void)dealloc
-{
-    [self->_debugName release];
-    [super dealloc];
-}
 
 - (void)main
 {

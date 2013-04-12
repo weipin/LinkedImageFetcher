@@ -120,15 +120,8 @@
 
 - (void)dealloc
 {
-    [self->_foundPageURLs release];
-    [self->_foundImageURLToPathMap release];
-    [self->_imagesDirPath release];
     [self->_queue invalidate];
     [self->_queue cancelAllOperations];
-    [self->_queue release];
-    [self->_error release];
-    [self->_URL release];
-    [super dealloc];
 }
 
 - (QWatchedOperationQueue *)queue
@@ -145,7 +138,7 @@
     // if you call it before the fetcher is done, you don't get a mutable array 
     // that's still being mutated.
 {
-    return [[self.foundImageURLToPathMap copy] autorelease];
+    return [self.foundImageURLToPathMap copy];
 }
 
 - (BOOL)start
@@ -185,7 +178,8 @@
     // When we set done our client's KVO might release us, meaning that we end 
     // up running with an invalid self.  This can cause all sorts of problems, 
     // so we do my standard retain/autorelease technique to avoid it.
-    [[self retain] autorelease];
+    id __autoreleasing autoreleasingSelf = self;
+    #pragma unused(autoreleasingSelf)
     self.done = YES;
 }
 
@@ -241,7 +235,8 @@
     self.runningOperationCount -= 1;
     if (self.runningOperationCount == 0) {
         // See comment in -stopWithError:.
-        [[self retain] autorelease];
+        id __autoreleasing autoreleasingSelf = self;
+        #pragma unused(autoreleasingSelf)
         self.done = YES;
     }    
 }
@@ -257,7 +252,7 @@
     
     [self.foundPageURLs addObject:pageURL];
     
-    op = [[[PageGetOperation alloc] initWithURL:pageURL depth:depth] autorelease];
+    op = [[PageGetOperation alloc] initWithURL:pageURL depth:depth];
     assert(op != nil);
     
     [self.queue addOperation:op finishedAction:@selector(pageGetDone:)];
@@ -292,7 +287,7 @@
         // Don't use op.URL here, but rather [op.lastResponse URL] so that relatives 
         // URLs work in the face of redirection.
         
-        nextOp = [[[LinkFinder alloc] initWithData:op.responseBody fromURL:[op.lastResponse URL] depth:op.depth] autorelease];
+        nextOp = [[LinkFinder alloc] initWithData:op.responseBody fromURL:[op.lastResponse URL] depth:op.depth];
         assert(nextOp != nil);
         
         nextOp.useRelaxedParsing = YES;
@@ -371,7 +366,7 @@
                     
                     [self.foundImageURLToPathMap setObject:[NSNull null] forKey:thisURLAbsolute];
 
-                    downloadOperation = [[[ImageDownloadOperation alloc] initWithURL:thisURLAbsolute imagesDirPath:self.imagesDirPath depth:op.depth + 1] autorelease];
+                    downloadOperation = [[ImageDownloadOperation alloc] initWithURL:thisURLAbsolute imagesDirPath:self.imagesDirPath depth:op.depth + 1];
                     assert(downloadOperation != nil);
 
                     [self.queue addOperation:downloadOperation finishedAction:@selector(downloadDone:)];
@@ -446,7 +441,7 @@
         if (maximumDepth < 0) {
             fprintf(stderr, "%s: maximum depth must be non-negative\n", getprogname());
         } else {
-            result = [[[self alloc] initWithURL:url] autorelease];
+            result = [[self alloc] initWithURL:url];
             if (result != nil) {
                 result.maximumDepth = maximumDepth;
             }

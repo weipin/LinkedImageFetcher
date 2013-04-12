@@ -57,53 +57,49 @@
 
 int main(int argc, char **argv)
 {
-    NSAutoreleasePool *     pool;
-    int                     retVal;
-    int                     maximumDepth;
-    LinkedImageFetcher *    fetcher;
-    
-    pool = [[NSAutoreleasePool alloc] init];
-    assert(pool != nil);
-
-    retVal = EXIT_FAILURE;
-    if ( (argc == 2) || (argc == 3) ) {
-        if (argc == 2) {
-            maximumDepth = 0;
-        } else {
-            maximumDepth = atoi(argv[2]);
-        }
-    
-        // Use our convenience method to create the LinkedImageFetcher object.
-    
-        fetcher = [LinkedImageFetcher fetcherWithURLString:argv[1] maximumDepth:maximumDepth];
-        if (fetcher == nil) {
-            // Do nothing.  +fetcherWithURLString:maximumDepth: has already printed the error.
-        } else {
-            BOOL    success;
-
-            // Run that object.
-            
-            success = [fetcher start];
-            if ( ! success ) {
-                fprintf(stderr, "%s: failed to create directory: %s\n", getprogname(), [fetcher.imagesDirPath UTF8String]);
+    @autoreleasepool {
+        int                     retVal;
+        int                     maximumDepth;
+        LinkedImageFetcher *    fetcher;
+        
+        retVal = EXIT_FAILURE;
+        if ( (argc == 2) || (argc == 3) ) {
+            if (argc == 2) {
+                maximumDepth = 0;
             } else {
-                do {
-                    [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]];
-                } while ( ! fetcher.done );
-                success = (fetcher.error == nil);
+                maximumDepth = atoi(argv[2]);
+            }
+        
+            // Use our convenience method to create the LinkedImageFetcher object.
+        
+            fetcher = [LinkedImageFetcher fetcherWithURLString:argv[1] maximumDepth:maximumDepth];
+            if (fetcher == nil) {
+                // Do nothing.  +fetcherWithURLString:maximumDepth: has already printed the error.
+            } else {
+                BOOL    success;
+
+                // Run that object.
+                
+                success = [fetcher start];
                 if ( ! success ) {
-                    fprintf(stderr, "%s: failed: %s %d\n", getprogname(), [[fetcher.error domain] UTF8String], (int) [fetcher.error code]);
+                    fprintf(stderr, "%s: failed to create directory: %s\n", getprogname(), [fetcher.imagesDirPath UTF8String]);
+                } else {
+                    do {
+                        [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]];
+                    } while ( ! fetcher.done );
+                    success = (fetcher.error == nil);
+                    if ( ! success ) {
+                        fprintf(stderr, "%s: failed: %s %d\n", getprogname(), [[fetcher.error domain] UTF8String], (int) [fetcher.error code]);
+                    }
+                }
+                if (success) {
+                    retVal = EXIT_SUCCESS;
                 }
             }
-            if (success) {
-                retVal = EXIT_SUCCESS;
-            }
+        } else {
+            fprintf(stderr, "usage: %s URL [depth]\n", getprogname());
         }
-    } else {
-        fprintf(stderr, "usage: %s URL [depth]\n", getprogname());
-    }
 
-    [pool drain];
-    
-    return retVal;
+        return retVal;
+    }
 }

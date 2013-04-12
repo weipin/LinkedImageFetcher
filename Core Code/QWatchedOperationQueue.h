@@ -55,7 +55,7 @@
 
 @interface QWatchedOperationQueue : NSOperationQueue
 {
-    id                      _target;
+    id                      __unsafe_unretained _target;
     NSThread *              _targetThread;
     CFMutableDictionaryRef  _operationToAction;
 }
@@ -65,7 +65,7 @@
     // target is /not/ retained, so we expect target's -dealloc method to call 
     // -invalidate.
 
-@property (atomic, assign, readonly) id             target;
+@property (atomic, unsafe_unretained, readonly) id             target;
     // The target object established when the object was initialised.
 
 @property (atomic, strong, readonly ) NSThread *    targetThread;

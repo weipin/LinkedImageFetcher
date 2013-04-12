@@ -114,7 +114,7 @@
     NSURLRequest *      _request;
     NSIndexSet *        _acceptableStatusCodes;
     NSSet *             _acceptableContentTypes;
-    id<QHTTPOperationAuthenticationDelegate>    _authenticationDelegate;
+    id<QHTTPOperationAuthenticationDelegate>    __unsafe_unretained _authenticationDelegate;
     NSOutputStream *    _responseOutputStream;
     NSUInteger          _defaultResponseSize;
     NSUInteger          _maximumResponseSize;
@@ -144,7 +144,7 @@
 // runLoopThread and runLoopModes inherited from QRunLoopOperation
 @property (atomic, copy,   readwrite) NSIndexSet *          acceptableStatusCodes;  // default is nil, implying 200..299
 @property (atomic, copy,   readwrite) NSSet *               acceptableContentTypes; // default is nil, implying anything is acceptable
-@property (atomic, assign, readwrite) id<QHTTPOperationAuthenticationDelegate>  authenticationDelegate;
+@property (atomic, unsafe_unretained, readwrite) id<QHTTPOperationAuthenticationDelegate>  authenticationDelegate;
 
 #if ! defined(NDEBUG)
 @property (atomic, copy,   readwrite) NSError *             debugError;             // default is nil

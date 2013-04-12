@@ -83,12 +83,6 @@
     return self;
 }
 
-- (void)dealloc
-{
-    [self->_imageFilePath release];
-    [self->_imagesDirPath release];
-    [super dealloc];
-}
 
 + (NSString *)defaultExtensionToMIMEType:(NSString *)type
     // See comment in header.
@@ -101,11 +95,11 @@
     
     @synchronized (self) {
         if (sTypeToExtensionMap == nil) {
-            sTypeToExtensionMap = [@{
+            sTypeToExtensionMap = @{
                 @"image/gif":  @"gif", 
                 @"image/png":  @"png", 
                 @"image/jpeg": @"jpg", 
-            } retain];
+            };
             assert(sTypeToExtensionMap != nil);
         }
     }

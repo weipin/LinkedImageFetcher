@@ -75,7 +75,6 @@
 - (void)dealloc
 {
     assert(self->_timer == nil);
-    [super dealloc];
 }
 
 - (void)operationDidStart

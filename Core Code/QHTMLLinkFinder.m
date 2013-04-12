@@ -104,22 +104,13 @@ enum {
     return self;
 }
 
-- (void)dealloc
-{
-    [self->_mutableLinkURLs release];
-    [self->_mutableImageURLs release];
-    [self->_error release];
-    [self->_URL release];
-    [self->_data release];
-    [super dealloc];
-}
 
 - (NSArray *)linkURLs
     // This getter returns a snapshot of the current parser state so that, 
     // if you call it before the parse is done, you don't get a mutable array 
     // that's still being mutated.
 {
-    return [[self->_mutableLinkURLs copy] autorelease];
+    return [self->_mutableLinkURLs copy];
 }
 
 - (NSArray *)imageURLs
@@ -127,7 +118,7 @@ enum {
     // if you call it before the parse is done, you don't get a mutable array 
     // that's still being mutated.
 {
-    return [[self->_mutableImageURLs copy] autorelease];
+    return [self->_mutableImageURLs copy];
 }
 
 - (void)addURLForCString:(const char *)cStr toArray:(NSMutableArray *)array
@@ -187,7 +178,7 @@ static void StartElementSAXFunc(
     QHTMLLinkFinder *   obj;
     size_t      attrIndex;
     
-    obj = (QHTMLLinkFinder *) ctx;
+    obj = (__bridge QHTMLLinkFinder *) ctx;
     assert([obj isKindOfClass:[QHTMLLinkFinder class]]);
     
     // libxml2's HTML parser lower cases tag and attribute names, so 
@@ -233,7 +224,7 @@ static xmlSAXHandler gSAXHandler = {
     
     context = htmlCreatePushParserCtxt(
         &gSAXHandler,
-        self,
+        (__bridge void *)(self),
         NULL,
         0,
         nil,

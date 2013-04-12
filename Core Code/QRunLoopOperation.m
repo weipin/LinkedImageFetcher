@@ -339,14 +339,8 @@
 - (void)dealloc
 {
     assert(self->_state != kQRunLoopOperationStateExecuting);
-    [self->_debugName release];
-    [self->_runLoopModes release];
-    [self->_runLoopThread release];
-    [self->_error release];
     #if ! defined(NDEBUG)
-        [self->_debugEventLog release];
     #endif
-    [super dealloc];
 }
 
 #pragma mark * Non-synthesized Properties
@@ -730,7 +724,7 @@
     
     @synchronized (self) {
         // _debugEventLog may be nil, and that's OK.
-        result = [[self->_debugEventLog copy] autorelease];
+        result = self->_debugEventLog;
     }
     return result;
 }

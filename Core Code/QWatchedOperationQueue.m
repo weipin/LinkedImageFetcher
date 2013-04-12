@@ -54,7 +54,7 @@
 #import "QWatchedOperationQueue.h"
 
 @interface QWatchedOperationQueue ()
-@property (atomic, assign, readwrite) id            target;
+@property (atomic, unsafe_unretained, readwrite) id            target;
 @end
 
 @implementation QWatchedOperationQueue
@@ -69,7 +69,7 @@
     self = [super init];
     if (self != nil) {
         self->_target = target;
-        self->_targetThread = [[NSThread currentThread] retain];
+        self->_targetThread = [NSThread currentThread];
         self->_operationToAction = CFDictionaryCreateMutable(NULL, 0, &kCFTypeDictionaryKeyCallBacks, NULL);
         assert(self->_operationToAction != NULL);
     }
@@ -83,8 +83,6 @@
         assert(CFDictionaryGetCount(self->_operationToAction) == 0);
         CFRelease(self->_operationToAction);
     }
-    [self->_targetThread release];
-    [super dealloc];
 }
 
 - (void)addOperation:(NSOperation *)op finishedAction:(SEL)action
@@ -105,7 +103,6 @@
     // Retain ourselves so that we can't go away while the operation is running, 
     // and then observe the finished property of the operation.
     
-    [self retain];
     [op addObserver:self forKeyPath:@"isFinished" options:0 context:&self->_target];
     
     // Call into the real NSOperationQueue.
@@ -175,9 +172,10 @@
     // -addOperation:finishedAction:.
     
     [op removeObserver:self forKeyPath:@"isFinished"];
-    [self autorelease];
+    id __autoreleasing autoreleasingSelf = self;
+    #pragma unused(autoreleasingSelf)
     
-    // If we haven't been invalidated, and the operation hasn't been 
+    // If we haven't been invalidated, and the operation hasn't been
     // cancelled, call the action method.
     
     // IMPORTANT: You have to be very careful here.  It's quite possible that the action 

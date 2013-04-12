@@ -62,7 +62,7 @@
     NSURL *                         _URL;
     NSUInteger                      _maximumDepth;
     NSString *                      _imagesDirPath;
-    id<LinkedImageFetcherDelegate>  _delegate;
+    id<LinkedImageFetcherDelegate>  __unsafe_unretained _delegate;
     QWatchedOperationQueue *        _queue;
     BOOL                            _done;
     NSError *                       _error;
@@ -86,7 +86,7 @@
 @property (nonatomic, assign, readwrite) NSUInteger     maximumDepth;       // defaults to 0
 @property (nonatomic, copy,   readwrite) NSString *     imagesDirPath;      // defaults to the "images" directory within the temporary directory
                                                                             // don't change this after calling -startWithURLString:
-@property (nonatomic, assign, readwrite) id<LinkedImageFetcherDelegate> delegate;
+@property (nonatomic, unsafe_unretained, readwrite) id<LinkedImageFetcherDelegate> delegate;
 
 // Things that are meaningful after you've called -start.
 

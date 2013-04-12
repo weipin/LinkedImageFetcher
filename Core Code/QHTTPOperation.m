@@ -171,21 +171,10 @@ static NSSet * sKeysImmutableOnceDataReceived;
     }
 
     #if ! defined(NDEBUG)
-        [self->_debugError release];
         [self->_debugDelayTimer invalidate];
-        [self->_debugDelayTimer release];
     #endif
     // any thread
-    [self->_request release];
-    [self->_acceptableStatusCodes release];
-    [self->_acceptableContentTypes release];
-    [self->_responseOutputStream release];
     assert(self->_connection == nil);               // should have been shut down by now
-    [self->_dataAccumulator release];
-    [self->_lastRequest release];
-    [self->_lastResponse release];
-    [self->_responseBody release];
-    [super dealloc];
 }
 
 #pragma mark * Properties
@@ -277,7 +266,7 @@ static NSSet * sKeysImmutableOnceDataReceived;
 
         // Create a connection that's scheduled in the required run loop modes.
         
-        self.connection = [[[NSURLConnection alloc] initWithRequest:self.request delegate:self startImmediately:NO] autorelease];
+        self.connection = [[NSURLConnection alloc] initWithRequest:self.request delegate:self startImmediately:NO];
         assert(self.connection != nil);
         
         for (NSString * mode in self.actualRunLoopModes) {
@@ -349,7 +338,7 @@ static NSSet * sKeysImmutableOnceDataReceived;
     
     assert(timer == self.debugDelayTimer);
 
-    error = [[[timer userInfo] retain] autorelease];
+    error = [timer userInfo];
     assert( (error == nil) || [error isKindOfClass:[NSError class]] );
     
     [self.debugDelayTimer invalidate];
